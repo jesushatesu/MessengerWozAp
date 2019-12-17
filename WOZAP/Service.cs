@@ -114,11 +114,6 @@ namespace WOZAP
 			}
 
             Console.WriteLine();
-
-            foreach (var usr in _users)
-            {
-                Console.WriteLine(usr.name);
-            }
         }
 
         public void SendMsg(string fromUserName, string toUserName, string msg)

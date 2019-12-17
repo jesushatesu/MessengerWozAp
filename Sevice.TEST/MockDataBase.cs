@@ -13,6 +13,7 @@ namespace Sevice.TEST
 
         public MockDataBase()
         {
+            users = new List<string>();
             users.Add("vadik");
             users.Add("iluxa");
             users.Add("tema");
