@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
 using DataBase;
+using ServiceWCF;
 
-namespace ServiceWCF
+namespace ServiceHost
 {
     class Program
     {
@@ -14,7 +15,7 @@ namespace ServiceWCF
         {
             var db = new DataBase.DataBase();
             var service = new Service(db);
-            using (ServiceHost host = new ServiceHost(service, new Uri("localhost:8080")))
+            using (System.ServiceModel.ServiceHost host = new System.ServiceModel.ServiceHost(service, new Uri("localhost:8080")))
             {
                 try
                 {
