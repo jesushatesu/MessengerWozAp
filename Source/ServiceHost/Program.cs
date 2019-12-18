@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
-using DataBase;
 using ServiceWCF;
 
 namespace ServiceHost
@@ -13,14 +12,14 @@ namespace ServiceHost
     {
         static void Main()
         {
-            var db = new DataBase.DataBase();
+            var db = new MSSQLBase.MSSQL();
             var service = new Service(db);
             using (System.ServiceModel.ServiceHost host = new System.ServiceModel.ServiceHost(service, new Uri("localhost:8080")))
             {
                 try
                 {
                     host.Open();
-                    Console.WriteLine("host started!");
+                    Console.WriteLine("host started!\n");
                     Console.ReadLine();
 
                     host.Close();

@@ -1,28 +1,26 @@
-﻿using DataBase;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
-using MainWindow;
 
 namespace ServiceWCF
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class Service : IService
     {
-        private DataBase.IDataBase _dataBase { get; set; }
+        private MSSQLBase.IDataBase _dataBase { get; set; }
         private List<User> _users { get; set; }
 
         public Service()
         {
-            _dataBase = new DataBase.DataBase();
+            _dataBase = new MSSQLBase.MSSQL();
             
             GetUsersList();
         }
 
-        public Service(DataBase.IDataBase db)
+        public Service(MSSQLBase.IDataBase db)
         {
             _dataBase = db;
 
@@ -129,7 +127,11 @@ namespace ServiceWCF
 					if (user.isConnected)
                         user.opCont.GetCallbackChannel<IServerChatCallback>().MsgCallback(fromUserName, toUserName, msg);
                     else
+                    {
+                        Console.WriteLine("Сообщение пытается улететь в БД!!!!");
                         _dataBase.AddMsg(fromUserName, toUserName, msg);
+                        Console.WriteLine("Сообщение улетело в БД!!!!");
+                    }
 
 					sendMsg = true;
 					break;
