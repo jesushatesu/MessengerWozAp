@@ -17,8 +17,11 @@ namespace MSSQLBase
         {
             Console.WriteLine("Trying to connect BD with ConnectionString...");
 
-            //_connectionString = ConfigurationManager.ConnectionStrings["DatabaseMSSQL"].ConnectionString;
-            _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\JesusHatesU\Desktop\MessengerWozAp\Build\DatabaseMSSQL.mdf;Integrated Security=True"; ;
+            _connectionString = ConfigurationManager.ConnectionStrings["DatabaseMSSQL"].ConnectionString;
+            // _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\JesusHatesU\Desktop\MessengerWozAp\Build\DatabaseMSSQL.mdf;Integrated Security=True";
+
+            var connection = new SqlConnection(_connectionString);
+            connection.Open();
 
             Console.WriteLine("BD is connected\n");
         }
