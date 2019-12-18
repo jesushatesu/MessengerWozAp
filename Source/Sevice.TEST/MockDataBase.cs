@@ -10,9 +10,11 @@ namespace Sevice.TEST
     public class MockDataBase : IDataBase
     {
         public List<string> users;
+        public List<string> messeges;
 
         public MockDataBase()
         {
+            messeges = new List<string>();
             users = new List<string>();
             users.Add("vadik");
             users.Add("iluxa");
@@ -24,9 +26,9 @@ namespace Sevice.TEST
             users.Add("maks");
         }
 
-        public void AddMsg(string Msg)
+        public void AddMsg(string msg)
         {
-            return;
+            users.Insert(0, msg);
         }
 
         public void AddUser(string userName)
@@ -36,13 +38,19 @@ namespace Sevice.TEST
 
         public string GetMsg(string UserName)
         {
-            string str = " ";
-            return str;
+            return messeges.ToArray()[0];
         }
 
         public string[] GetUsers()
         {
-            string[] str = new string[] { " ", " " };
+            string[] str = new string[users.Count()];
+            int i = 0;
+
+            foreach (var usr in users)
+            {
+                str[i++] = usr;
+            }
+
             return str;
         }
 
@@ -54,27 +62,35 @@ namespace Sevice.TEST
 
         public string[] GetMsg(string userNameFrom, string userNameTo)
         {
-            throw new NotImplementedException();
+            string[] str = new string[messeges.Count()];
+            int i = 0;
+
+            foreach (var msg in messeges)
+            {
+                str[i++] = msg;
+            }
+
+            return str;
         }
 
         public int GetId(string username)
         {
-            throw new NotImplementedException();
+            return 0;
         }
 
-        public void AddMsg(string from, string to, string msgg)
+        public void AddMsg(string from, string to, string msg)
         {
-            throw new NotImplementedException();
+            messeges.Insert(0, msg);
         }
 
         public bool HaveMsg(string usr, string userName)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public void DeleteMsg(string fromUser, string toUser)
         {
-            throw new NotImplementedException();
+            return;
         }
     }
 }
