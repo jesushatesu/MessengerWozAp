@@ -7,382 +7,394 @@ using MainWindow.Properties;
 
 namespace MainWindow
 {
-	public partial class UserWindow : Form, IServiceCallback
-	{
-		private SingInWindow _singInWindow;
-		private string _userName;
-		private List<ChatUser> _allChatUsers;
-		private Point _lastPoint;
-		private UserListItem _currentUserItem;
-		private List<UserListItem> _userListItems;
-		private ServiceClient _client;
+    public partial class UserWindow : Form, IServiceCallback
+    {
+        private SingInWindow _singInWindow;
+        private string _userName;
+        private List<ChatUser> _allChatUsers;
+        private Point _lastPoint;
+        private int _idCurrentUserItem;
+        private List<UserListItem> _userListItems;
+        private ServiceClient _client;
 
-		public UserWindow(string userName, SingInWindow singInWindow)
-		{
-			InitializeComponent();
-			
-			_currentUserItem = new UserListItem(this);
-			_userName = userName;
-			_singInWindow = singInWindow;
-			this.userName.Text = userName;
-			_allChatUsers = new List<ChatUser>();
-			_userListItems = new List<UserListItem>();
-		}
+        public UserWindow(string userName, SingInWindow singInWindow)
+        {
+            InitializeComponent();
 
-		// ----------- callbacks ---------------
+            _idCurrentUserItem = -1;
+            _userName = userName;
+            _singInWindow = singInWindow;
+            this.userName.Text = userName;
+            _allChatUsers = new List<ChatUser>();
+            _userListItems = new List<UserListItem>();
+        }
 
-		public void MsgCallback(string fromUser, string toUser, string msgWithTime)
-		{
-			if (toUser != _userName | msgWithTime == "")
-				return;
+        // --------- callbacks ------------
 
-			// format msgWithTime: "some msg 12.11.19"
-			string[] words = msgWithTime.Split(new char[] { ' ' });
-			string timeMsg = DateTime.Now.ToString();
-			if (words.Length >= 2)
-			{
-				timeMsg = words[words.Length - 2];
-				timeMsg += words[words.Length - 1];
-				words[words.Length - 1] = "";
-				words[words.Length - 2] = "";
-			}
+        public void MsgCallback(string fromUser, string toUser, string msgWithTime)
+        {
+            if (toUser != _userName | msgWithTime == "")
+                return;
 
-			string msgWithoutTime = String.Join(" ", words);
-			if (msgWithoutTime == "  " | msgWithoutTime == "\n  ")
-				return;
+            // format msgWithTime: "some msg 12.11.19"
+            string[] words = msgWithTime.Split(new char[] { ' ' });
+            string timeMsg = DateTime.Now.ToString();
+            if (words.Length > 2)
+            {
+                timeMsg = words[words.Length - 2];
+                timeMsg += words[words.Length - 1];
+                words[words.Length - 1] = "";
+                words[words.Length - 2] = "";
+            }
 
-			for (int i = 0; i < _allChatUsers.Count; ++i)
-			{
-				if (_allChatUsers[i].userName == fromUser)
-				{
-					MessageItem msgItem = new MessageItem(msgWithoutTime, timeMsg,
-							_userName + fromUser + timeMsg, fromUser, false);
+            string msgWithoutTime = String.Join(" ", words);
+            if (msgWithoutTime == "  " | msgWithoutTime == "\n  ")
+                return;
 
-					_allChatUsers[i].msgItems.Add(msgItem);
+            int indexUser = -1;
+            for (int i = 0; i < _allChatUsers.Count; ++i)
+                if (_allChatUsers[i].userName == fromUser)
+                {
+                    indexUser = i;
+                    break;
+                }
 
-					if (_currentUserItem.UserName == fromUser)
-					{
-						this.msgFlowPanel.Controls.Add(msgItem);
-					}
-					else
-					{
-						_allChatUsers.ToArray()[i].haveMsg = true;
-						for (int k = 0; k < _userListItems.Count; ++k)
-						{
-							if (_userListItems[k].UserName == fromUser)
-							{
-								_userListItems[k].HaveMsgImage = Resources.haveMsg;
-								break;
-							}
-						}
-					}
-					break;
-				}
-			}
-		}
+            if (indexUser != -1)
+            {
+                MessageItem msgItem = new MessageItem(msgWithoutTime, timeMsg,
+                            _userName + fromUser + timeMsg, fromUser, false);
 
-		public void ConnectUserCallback(string userName)
-		{
-			if (userName == _userName)
-				return;
+                _allChatUsers[indexUser].msgItems.Add(msgItem);
+                bool isCurrUser = false;
+                if (_idCurrentUserItem != -1)
+                    if (_userListItems[_idCurrentUserItem].UserName == fromUser)
+                        isCurrUser = true;
 
-			bool isNewUser = true;
-			for (int i = 0; i < _allChatUsers.Count; ++i)
-			{
-				if (_allChatUsers.ToArray()[i].userName == userName)
-				{
-					ChatUser newCU = new ChatUser();
-					newCU = _allChatUsers.ToArray()[i];
-					newCU.isConnected = true;
-					_allChatUsers.Remove(_allChatUsers[i]);
-					_allChatUsers.Insert(i, newCU);
+                if (isCurrUser)
+                {
+                    this.msgFlowPanel.Controls.Add(msgItem);
+                    this.msgFlowPanel.AutoScrollPosition = new Point(msgItem.Left, msgItem.Top);
+                }
+                else
+                {
+                    _allChatUsers.ToArray()[indexUser].haveMsg = true;
+                    for (int k = 0; k < _userListItems.Count; ++k)
+                    {
+                        if (_userListItems[k].UserName == fromUser)
+                        {
+                            _userListItems[k].HaveMsgImage = Resources.haveMsg;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
-					isNewUser = false;
-				}
-			}
+        public void ConnectUserCallback(string userName)
+        {
+            if (userName == _userName)
+                return;
 
-			if (isNewUser)
-			{
-				ChatUser cu = new ChatUser
-				{
-					userName = userName,
-					isConnected = true,
-					haveMsg = false,
-					msgItems = new List<MessageItem>()
-				};
-				_allChatUsers.Add(cu);
-				UserListItem item = new UserListItem(this);
+            bool isNewUser = true;
+            for (int i = 0; i < _allChatUsers.Count; ++i)
+            {
+                if (_allChatUsers.ToArray()[i].userName == userName)
+                {
+                    ChatUser newCU = new ChatUser();
+                    newCU = _allChatUsers.ToArray()[i];
+                    newCU.isConnected = true;
+                    _allChatUsers.Remove(_allChatUsers[i]);
+                    _allChatUsers.Insert(i, newCU);
 
-				item.UserName = userName;
-				item.ConnectedImage = Resources.Circle_Green;
-				item.HaveMsgImage = Resources.Tick;
-				_userListItems.Add(item);
-				this.PanelListUsers.Controls.Add(item);
-			}
-			else
-			{
-				for (int i = 0; i < _userListItems.Count; ++i)
-					if (_userListItems[i].UserName == userName)
-						_userListItems[i].ConnectedImage = Resources.Circle_Green;
-			}
-		}
+                    isNewUser = false;
+                }
+            }
 
-		public void DisconnectUserCallback(string userName)
-		{
-			if (userName == _userName)
-				return;
+            if (isNewUser)
+            {
+                ChatUser cu = new ChatUser
+                {
+                    userName = userName,
+                    isConnected = true,
+                    haveMsg = false,
+                    msgItems = new List<MessageItem>()
+                };
+                _allChatUsers.Add(cu);
+                UserListItem item = new UserListItem(this);
 
-			for (int i = 0; i < _allChatUsers.Count; ++i)
-			{
-				if (_allChatUsers[i].userName == userName)
-				{
-					ChatUser newCU = new ChatUser();
-					newCU = _allChatUsers.ToArray()[i];
-					newCU.isConnected = false;
-					_allChatUsers.Remove(_allChatUsers[i]);
-					_allChatUsers.Insert(i, newCU);
-				}
-				if (_userListItems[i].UserName == userName)
-					_userListItems[i].ConnectedImage = Resources.Circle_Red;
-			}
+                item.UserName = userName;
+                item.ConnectedImage = Resources.Circle_Green;
+                item.HaveMsgImage = Resources.Tick;
+                _userListItems.Add(item);
+                this.PanelListUsers.Controls.Add(item);
+            }
+            else
+            {
+                for (int i = 0; i < _userListItems.Count; ++i)
+                    if (_userListItems[i].UserName == userName)
+                        _userListItems[i].ConnectedImage = Resources.Circle_Green;
+            }
+        }
 
-			if (_currentUserItem.UserName == userName)
-				_currentUserItem.ConnectedImage = Resources.Circle_Red;
+        public void DisconnectUserCallback(string userName)
+        {
+            if (userName == _userName)
+                return;
 
-			//PopulateInemsUser();
-		}
+            for (int i = 0; i < _allChatUsers.Count; ++i)
+            {
+                if (_allChatUsers[i].userName == userName)
+                {
+                    ChatUser newCU = new ChatUser();
+                    newCU = _allChatUsers.ToArray()[i];
+                    newCU.isConnected = false;
+                    _allChatUsers.Remove(_allChatUsers[i]);
+                    _allChatUsers.Insert(i, newCU);
+                }
+                if (_userListItems[i].UserName == userName)
+                    _userListItems[i].ConnectedImage = Resources.Circle_Red;
+            }
+        }
 
-		// ----------- get ---------------
+        // --------- get / set -------------
 
-		public string GetUserName()
-		{
-			return _userName;
-		}
+        public string GetUserName()
+        {
+            return _userName;
+        }
 
-		public List<string> GetAllUsersName()
-		{
-			List<string> usersName = new List<string> { };
-			foreach (ChatUser cu in _allChatUsers)
-			{
-				usersName.Add(cu.userName);
-			}
+        public List<MessageItem> GetMsgChatUsers(string userName)
+        {
+            List<MessageItem> mi = new List<MessageItem>();
+            foreach (ChatUser cu in _allChatUsers)
+            {
+                if (cu.userName == userName)
+                {
+                    mi = cu.msgItems;
+                    break;
+                }
+            }
 
-			return usersName;
-		}
+            return mi;
+        }
 
-		public bool ThisUserIsConnect(string username)
-		{
-			bool isConnect = false;
-			for (int i = 0; i < _allChatUsers.Count; ++i)
-			{
-				if (_allChatUsers[i].userName == username)
-				{
-					isConnect = _allChatUsers[i].isConnected;
-					break;
-				}
-			}
+        public bool ThisUserIsConnect(string username)
+        {
+            bool isConnect = false;
+            for (int i = 0; i < _allChatUsers.Count; ++i)
+            {
+                if (_allChatUsers[i].userName == username)
+                {
+                    isConnect = _allChatUsers[i].isConnected;
+                    break;
+                }
+            }
 
-			return isConnect;
-		}
+            return isConnect;
+        }
 
-		// ---------- chat logic ---------
+        public void SetIdCurrentUserItem(int id)
+        {
+            _idCurrentUserItem = id;
+        }
 
-		private void UserWindow_Load(object sender, EventArgs e)
-		{
+        // ---------- logic design ---------
 
-			_client = new ServiceClient(new System.ServiceModel.InstanceContext(this));
-			string[] allUserArr = allUserArr = _client.Connect(_userName);
+        private void UserWindow_Load(object sender, EventArgs e)
+        {
 
-			for (int i = 0; i < allUserArr.Length; ++i)
-			{
-				string word = allUserArr[i];
-				string un = word;
-				un = un.Substring(0, un.Length - 2);
+            _client = new ServiceClient(new System.ServiceModel.InstanceContext(this));
+            string[] allUserArr = allUserArr = _client.Connect(_userName);
 
-				if (_userName != un)
-				{
-					ChatUser newCU = new ChatUser();
-					newCU.userName = un;
-					newCU.isConnected = ('1' == word[word.Length - 2]) ? true : false;
-					newCU.haveMsg = ('1' == word[word.Length - 1]) ? true : false;
-					newCU.msgItems = new List<MessageItem>();
-					_allChatUsers.Add(newCU);
-				}
-			}
+            for (int i = 0; i < allUserArr.Length; ++i)
+            {
+                string word = allUserArr[i];
+                string un = word;
+                un = un.Substring(0, un.Length - 2);
 
-			PopulateInemsUser();
-		}
+                if (_userName != un)
+                {
+                    ChatUser newCU = new ChatUser();
+                    newCU.userName = un;
+                    newCU.isConnected = ('1' == word[word.Length - 2]) ? true : false;
+                    newCU.haveMsg = ('1' == word[word.Length - 1]) ? true : false;
+                    newCU.msgItems = new List<MessageItem>();
+                    _allChatUsers.Add(newCU);
+                }
+            }
 
-		public void ClickUserItem(UserListItem item)
-		{
-			СhangeCurrentUserItem(item);
+            PopulateInemsUser();
+        }
 
-			for (int i = 0; i < _allChatUsers.Count; ++i)
-			{
-				if (_allChatUsers[i].userName == item.UserName)
-				{
-					string[] msgs = _client.GetUnsentMsg(item.UserName, _userName); 
-					for (int h = 0; h < msgs.Length; ++h)
-						MsgCallback(item.UserName, _userName, msgs[h]);
+        public void ClickUserItem(UserListItem item)
+        {
+            СhangeCurrentUserItem(item);
 
-					this.msgFlowPanel.Controls.Clear();
+            for (int i = 0; i < _allChatUsers.Count; ++i)
+            {
+                if (_allChatUsers[i].userName == item.UserName)
+                {
+                    string[] msgs = _client.GetUnsentMsg(item.UserName, _userName);
+                    for (int h = 0; h < msgs.Length; ++h)
+                        MsgCallback(item.UserName, _userName, msgs[h]);
 
-					for (int k = 0; k < _allChatUsers[i].msgItems.Count; ++k)
-					{
-						this.msgFlowPanel.Controls.Add(_allChatUsers[i].msgItems[k]);
-					}
-					break;
-				}
-			}
+                    this.msgFlowPanel.Controls.Clear();
 
-		}
+                    for (int k = 0; k < _allChatUsers[i].msgItems.Count; ++k)
+                    {
+                        this.msgFlowPanel.Controls.Add(_allChatUsers[i].msgItems[k]);
+                    }
+                    break;
+                }
+            }
 
-		private void SedMsfFromMe(string textMsg)
-		{
-			char[] charsToTrim = { ' ', '\t', '\n', '\r' };
-			textMsg = textMsg.Trim(charsToTrim);
-			if (textMsg == "" | textMsg == "\n" | _currentUserItem == null)
-				return;
+        }
 
-			string date = DateTime.Now.ToString();
+        private void SedMsfFromMe(string textMsg)
+        {
+            char[] charsToTrim = { ' ', '\t', '\n', '\r' };
+            textMsg = textMsg.Trim(charsToTrim);
+            if (textMsg == "" | textMsg == "\n" | _idCurrentUserItem == -1)
+                return;
 
-			MessageItem msg = new MessageItem(
-				textMsg,
-				date,
-				_userName + _currentUserItem.UserName + date,
-				_currentUserItem.UserName,
-				true
-			);
+            string date = DateTime.Now.ToString();
 
-			this.msgFlowPanel.Controls.Add(msg);
+            MessageItem msg = new MessageItem(
+                textMsg,
+                date,
+                _userName + _userListItems[_idCurrentUserItem].UserName + date,
+                _userListItems[_idCurrentUserItem].UserName,
+                true
+            );
 
-			for (int i = 0; i < _allChatUsers.Count; ++i)
-			{
-				if (_allChatUsers[i].userName == _currentUserItem.UserName)
-				{
-					_allChatUsers[i].msgItems.Add(msg);
-					break;
-				}
-			}
+            this.msgFlowPanel.Controls.Add(msg);
+            this.msgFlowPanel.AutoScrollPosition = new Point(msg.Left, msg.Top);
+            for (int i = 0; i < _allChatUsers.Count; ++i)
+            {
+                if (_allChatUsers[i].userName == _userListItems[_idCurrentUserItem].UserName)
+                {
+                    _allChatUsers[i].msgItems.Add(msg);
+                    break;
+                }
+            }
 
-			_client.SendMsg(_userName, _currentUserItem.UserName, textMsg + " " + date);
-		}
+            _client.SendMsg(_userName, _userListItems[_idCurrentUserItem].UserName, textMsg + " " + date);
+        }
 
-		private void PopulateInemsUser()
-		{
-			this.PanelListUsers.Controls.Clear();
+        private void PopulateInemsUser()
+        {
+            this.PanelListUsers.Controls.Clear();
 
-			_userListItems.Clear();
+            _userListItems.Clear();
 
-			for (int i = 0; i < _allChatUsers.Count; ++i)
-			{
-				UserListItem item = new UserListItem(this);
-				item.UserName = _allChatUsers[i].userName;
+            for (int i = 0; i < _allChatUsers.Count; ++i)
+            {
+                UserListItem item = new UserListItem(this);
+                item.UserName = _allChatUsers[i].userName;
 
-				if (_allChatUsers[i].isConnected)
-					item.ConnectedImage = Resources.Circle_Green;
-				else
-					item.ConnectedImage = Resources.Circle_Red;
-
-
-				if (_allChatUsers[i].haveMsg)
-					item.HaveMsgImage = Resources.haveMsg;
-				else
-					item.HaveMsgImage = Resources.Tick;
-
-				if (item == _currentUserItem)
-				{
-					СhangeCurrentUserItem(item);
-				}
-
-				_userListItems.Add(item);
-				this.PanelListUsers.Controls.Add(item);
-			}
-		}
-
-		private void СhangeCurrentUserItem(UserListItem item)
-		{
-			_currentUserItem.SetBackColor(Color.White);
-			_currentUserItem.clickAtThis = false;
-			_currentUserItem = item;
-			item.SetBackColor(Color.FromArgb(132, 133, 235));
-			item.HaveMsgImage = Resources.Tick;
-		}
+                if (_allChatUsers[i].isConnected)
+                    item.ConnectedImage = Resources.Circle_Green;
+                else
+                    item.ConnectedImage = Resources.Circle_Red;
 
 
-		//----------- design -------------
+                if (_allChatUsers[i].haveMsg)
+                    item.HaveMsgImage = Resources.haveMsg;
+                else
+                    item.HaveMsgImage = Resources.Tick;
 
-		private void topblokAuth_MouseMove(object sender, MouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Left)
-			{
-				this.Left += e.X - _lastPoint.X;
-				this.Top += e.Y - _lastPoint.Y;
-			}
-		}
+                _userListItems.Add(item);
+                this.PanelListUsers.Controls.Add(item);
+            }
+        }
 
-		private void topblokAuth_MouseDown(object sender, MouseEventArgs e)
-		{
-			_lastPoint = new Point(e.X, e.Y);
-		}
+        public void СhangeCurrentUserItem(UserListItem item)
+        {
+            if (_idCurrentUserItem != -1)
+            {
+                _userListItems[_idCurrentUserItem].SetBackColor(Color.White);
+                _userListItems[_idCurrentUserItem].clickAtThis = false;
+            }
 
-		private void closeButton_Click(object sender, EventArgs e)
-		{
-			this.Close();
-			_client.Disconnect(_userName);
-			_singInWindow.Close();
-		}
+            _idCurrentUserItem = _userListItems.IndexOf(item);
+            item.SetBackColor(Color.FromArgb(132, 133, 235));
+            item.HaveMsgImage = Resources.Tick;
+        }
 
-		private void closeButton_MouseEnter(object sender, EventArgs e)
-		{
-			this.closeButton.BackColor = Color.Red;
-		}
 
-		private void closeButton_MouseLeave(object sender, EventArgs e)
-		{
-			this.closeButton.BackColor = Color.FromArgb(62, 128, 182);
-		}
+        //--------- design winforms ----------
 
-		private void buttonMinimized_Click(object sender, EventArgs e)
-		{
-			this.WindowState = FormWindowState.Minimized;
-		}
+        private void topblokAuth_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                this.Left += e.X - _lastPoint.X;
+                this.Top += e.Y - _lastPoint.Y;
+            }
+        }
 
-		private void buttonMinimized_MouseEnter(object sender, EventArgs e)
-		{
-			this.buttonMinimized.BackColor = Color.FromArgb(131, 175, 230);
-		}
+        private void topblokAuth_MouseDown(object sender, MouseEventArgs e)
+        {
+            _lastPoint = new Point(e.X, e.Y);
+        }
 
-		private void buttonMinimized_MouseLeave(object sender, EventArgs e)
-		{
-			this.buttonMinimized.BackColor = Color.FromArgb(62, 128, 182);
-		}
+        private void closeButton_Click(object sender, EventArgs e)
+        {
+            this.Close();
+            _client.Disconnect(_userName);
+            _singInWindow.Close();
+        }
 
-		private void buttonLogOut_Click(object sender, EventArgs e)
-		{
-			this.Close();
-			_client.Disconnect(_userName);
-			_singInWindow.Show();
-		}
+        private void closeButton_MouseEnter(object sender, EventArgs e)
+        {
+            this.closeButton.BackColor = Color.Red;
+        }
 
-		private void msgButton_MouseClick(object sender, MouseEventArgs e)
-		{
-			string textMsg = this.msgTextBox.Text;
-			this.msgTextBox.Text = "";
-			SedMsfFromMe(textMsg);
-		}
+        private void closeButton_MouseLeave(object sender, EventArgs e)
+        {
+            this.closeButton.BackColor = Color.FromArgb(62, 128, 182);
+        }
 
-		private void msgTextBox_KeyDown(object sender, KeyEventArgs e)
-		{
-			MouseEventArgs v = new MouseEventArgs(MouseButtons, 1, 1, 1, 1);
-			if (e.KeyData == Keys.Enter)
-			{
-				string textMsg = this.msgTextBox.Text;
-				this.msgTextBox.Text = "";
-				SedMsfFromMe(textMsg);
-			}
-			
-		}
+        private void buttonMinimized_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+        }
 
-	}
+        private void buttonMinimized_MouseEnter(object sender, EventArgs e)
+        {
+            this.buttonMinimized.BackColor = Color.FromArgb(131, 175, 230);
+        }
+
+        private void buttonMinimized_MouseLeave(object sender, EventArgs e)
+        {
+            this.buttonMinimized.BackColor = Color.FromArgb(62, 128, 182);
+        }
+
+        private void buttonLogOut_Click(object sender, EventArgs e)
+        {
+            this.Close();
+            _client.Disconnect(_userName);
+            _singInWindow.Show();
+        }
+
+        private void msgButton_MouseClick(object sender, MouseEventArgs e)
+        {
+            string textMsg = this.msgTextBox.Text;
+            this.msgTextBox.Text = "";
+            SedMsfFromMe(textMsg);
+        }
+
+        private void msgTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            MouseEventArgs v = new MouseEventArgs(MouseButtons, 1, 1, 1, 1);
+            if (e.KeyData == Keys.Enter)
+            {
+                string textMsg = this.msgTextBox.Text;
+                this.msgTextBox.Text = "";
+                SedMsfFromMe(textMsg);
+            }
+
+        }
+
+    }
 }
