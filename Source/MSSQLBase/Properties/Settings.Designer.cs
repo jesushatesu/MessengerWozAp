@@ -44,5 +44,16 @@ namespace MSSQLBase.Properties {
                 return ((string)(this["DatabaseMSSQLConnectionString"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=localhost\\SQLEXPRESS;Initial Catalog=MSSQLDDatabaseWozap;Integrated S" +
+            "ecurity=True")]
+        public string MSSQLDDatabaseWozapConnectionString {
+            get {
+                return ((string)(this["MSSQLDDatabaseWozapConnectionString"]));
+            }
+        }
     }
 }

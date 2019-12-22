@@ -36,7 +36,8 @@ namespace ServiceWCF
         {
             Console.WriteLine();
             bool isNewUser = true;
-			
+
+            Console.WriteLine("here");
             for (int i = 0; i < _users.Count(); i++)
             {
                 if (_users[i].name == userName)
@@ -46,10 +47,14 @@ namespace ServiceWCF
 				}
             }
 
+            Console.WriteLine("here");
             if (isNewUser)
 				_dataBase.AddUser(userName);
 
-			User newUser = new User()
+
+            Console.WriteLine("here");
+
+            User newUser = new User()
 			{
 				name = userName,
 				isConnected = true,
