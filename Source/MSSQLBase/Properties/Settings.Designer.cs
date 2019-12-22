@@ -48,11 +48,33 @@ namespace MSSQLBase.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=localhost\\SQLEXPRESS;Initial Catalog=MSSQLDDatabaseWozap;Integrated S" +
-            "ecurity=True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=localhost\\SQLEXPRESS; Initial Catalog=MSSQLDDatabaseWozap;Integrated " +
+            "Security=True")]
         public string MSSQLDDatabaseWozapConnectionString {
             get {
                 return ((string)(this["MSSQLDDatabaseWozapConnectionString"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=localhost\\SQLEXPRESS;Initial Catalog=MSSQLDDatabaseWozap;Integrated S" +
+            "ecurity=True")]
+        public string MSSQLDDatabaseWozapConnectionString1 {
+            get {
+                return ((string)(this["MSSQLDDatabaseWozapConnectionString1"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=localhost\\SQLEXPRESS;Initial Catalog=MSSQLDDatabaseWozap;Persist Secu" +
+            "rity Info=True;User ID=sa;Password=1234")]
+        public string MSSQLDDatabaseWozapConnectionString2 {
+            get {
+                return ((string)(this["MSSQLDDatabaseWozapConnectionString2"]));
             }
         }
     }

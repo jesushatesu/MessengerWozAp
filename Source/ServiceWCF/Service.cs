@@ -36,8 +36,7 @@ namespace ServiceWCF
         {
             Console.WriteLine();
             bool isNewUser = true;
-
-            Console.WriteLine("here");
+            
             for (int i = 0; i < _users.Count(); i++)
             {
                 if (_users[i].name == userName)
@@ -46,13 +45,9 @@ namespace ServiceWCF
 					isNewUser = false;
 				}
             }
-
-            Console.WriteLine("here");
+            
             if (isNewUser)
 				_dataBase.AddUser(userName);
-
-
-            Console.WriteLine("here");
 
             User newUser = new User()
 			{
@@ -131,12 +126,7 @@ namespace ServiceWCF
 					Console.WriteLine("Waiting send msg [" + fromUserName + "] to [" + toUserName + "]");
 					if (user.isConnected)
                         user.opCont.GetCallbackChannel<IServerChatCallback>().MsgCallback(fromUserName, toUserName, msg);
-                    else
-                    {
-                        Console.WriteLine("Сообщение пытается улететь в БД!!!!");
-                        _dataBase.AddMsg(fromUserName, toUserName, msg);
-                        Console.WriteLine("Сообщение улетело в БД!!!!");
-                    }
+                    else _dataBase.AddMsg(fromUserName, toUserName, msg);
 
 					sendMsg = true;
 					break;

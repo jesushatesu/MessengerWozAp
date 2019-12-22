@@ -11,32 +11,25 @@ namespace MSSQLBase
 {
     public class MSSQL : IDataBase
     {
-        private readonly string _connectionString;
-
         public MSSQL()
         {
             Console.WriteLine("Trying to connect BD with ConnectionString...");
-            
+
             Console.WriteLine("BD is connected\n");
         }
 
         public void AddMsg(string from, string to, string msg)
         {
             WozapDatabaseDataContext db = new WozapDatabaseDataContext();
+            
+            Message user = new Message();
+            user.Id1 = GetId(from);
+            user.Id2 = GetId(to);
+            user.Msg = msg;
 
-            var connection = new SqlConnection(@"Data Source=localhost\SQLEXPRESS; Initial Catalog=MSSQLDDatabaseWozap;Integrated Security=True");
-            connection.Open();
-
-            int ida = GetId(from);
-            int idb = GetId(to);
-            Messege user = new Messege { Id1 = ida, Id2 = idb, Msg = msg };
-            Console.WriteLine("Сообщение сформировано в структуру для отправления в БД!!!!");
-
-            db.GetTable<Messege>().InsertOnSubmit(user);
-            Console.WriteLine("Структура улетела в БД!!!!");
+            db.Messages.InsertOnSubmit(user);
 
             db.SubmitChanges();
-            Console.WriteLine("Изменения в БД подтверждены!!!!");
         }
 
         public void AddUser(string user)
@@ -54,10 +47,10 @@ namespace MSSQLBase
             int b = GetId(toUser);
 
             WozapDatabaseDataContext db2 = new WozapDatabaseDataContext();
-            foreach (var user in db2.GetTable<Messege>())
+            foreach (var user in db2.GetTable<Message>())
             {
                 if (user.Id1 == a && user.Id2 == b && user.Msg != null)
-                    db2.GetTable<Messege>().DeleteOnSubmit(user);
+                    db2.GetTable<Message>().DeleteOnSubmit(user);
 
                 db2.SubmitChanges();
             }
@@ -88,7 +81,7 @@ namespace MSSQLBase
             int b = GetId(userNameTo);
 
             int count = 0;
-            foreach (var user in db.GetTable<Messege>().OrderByDescending(u => u.Id2))
+            foreach (var user in db.GetTable<Message>().OrderByDescending(u => u.Id2))
             {
                 if (user.Id2 == b && user.Id1 == a)
                 {
@@ -98,7 +91,7 @@ namespace MSSQLBase
             string[] str = new string[count];
             int i = 0;
 
-            foreach (var user in db.GetTable<Messege>().OrderByDescending(u => u.Id1))
+            foreach (var user in db.GetTable<Message>().OrderByDescending(u => u.Id1))
             {
                 if (user.Id2 == b && user.Id1 == a)
                 {
@@ -153,7 +146,7 @@ namespace MSSQLBase
             int a = GetId(fromUser);
 
             WozapDatabaseDataContext db2 = new WozapDatabaseDataContext();
-            foreach (var user in db2.GetTable<Messege>().OrderByDescending(u => u.Id2))
+            foreach (var user in db2.GetTable<Message>().OrderByDescending(u => u.Id2))
             {
                 if (user.Id2 == b && user.Id1 == a)
                 {

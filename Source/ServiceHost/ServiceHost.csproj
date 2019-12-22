@@ -55,10 +55,6 @@
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataBase\DataBase.csproj">
-      <Project>{b4e2b77d-5e27-4b68-94d7-180f6ad98214}</Project>
-      <Name>DataBase</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MSSQLBase\MSSQLBase.csproj">
       <Project>{f4c03e78-243c-4f1b-91cd-6ba1d98eace9}</Project>
       <Name>MSSQLBase</Name>
