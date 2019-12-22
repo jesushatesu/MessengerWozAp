@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="MSSQLDatabaseTEST">
+  <DataContextMoniker Name="/MSSQLDatabaseTESTDataContext" />
+  <nestedChildShapes>
+    <classShape Id="6d5ae5c2-40e3-48d2-9b4b-6c03678e1d37" absoluteBounds="4.375, 1.375, 2, 1.3862939453125">
+      <DataClassMoniker Name="/MSSQLDatabaseTESTDataContext/Message" />
+      <nestedChildShapes>
+        <elementListCompartment Id="ff551ddf-19fd-4ab4-b66b-c948334aa766" absoluteBounds="4.39, 1.835, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="f78d4938-e621-4b37-9246-5fbb1c93352a" absoluteBounds="1.25, 1.25, 2, 1.1939925130208333">
+      <DataClassMoniker Name="/MSSQLDatabaseTESTDataContext/User" />
+      <nestedChildShapes>
+        <elementListCompartment Id="ff5aa269-a9a0-4de3-97d2-7d8534d56eb4" absoluteBounds="1.2649999999999997, 1.71, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

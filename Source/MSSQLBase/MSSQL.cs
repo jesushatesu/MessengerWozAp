@@ -11,30 +11,34 @@ namespace MSSQLBase
 {
     public class MSSQL : IDataBase
     {
-        public MSSQL()
+        private dynamic db;
+
+        public MSSQL(dynamic db1)
         {
             Console.WriteLine("Trying to connect BD with ConnectionString...");
+
+            db = db1;
 
             Console.WriteLine("BD is connected\n");
         }
 
         public void AddMsg(string from, string to, string msg)
         {
-            WozapDatabaseDataContext db = new WozapDatabaseDataContext();
+            //WozapDatabaseDataContext db = new WozapDatabaseDataContext();
             
             Message user = new Message();
             user.Id1 = GetId(from);
             user.Id2 = GetId(to);
             user.Msg = msg;
 
-            db.Messages.InsertOnSubmit(user);
+            db.GetTable<Message>().InsertOnSubmit(user);
 
             db.SubmitChanges();
         }
 
         public void AddUser(string user)
         {
-            WozapDatabaseDataContext db = new WozapDatabaseDataContext();
+            //WozapDatabaseDataContext db = new WozapDatabaseDataContext();
             User user1 = new User { name = user };
 
             db.GetTable<User>().InsertOnSubmit(user1);
@@ -46,14 +50,14 @@ namespace MSSQLBase
             int a = GetId(fromUser);
             int b = GetId(toUser);
 
-            WozapDatabaseDataContext db2 = new WozapDatabaseDataContext();
-            foreach (var user in db2.GetTable<Message>())
+            //WozapDatabaseDataContext db2 = new WozapDatabaseDataContext();
+            foreach (var user in db.GetTable<Message>())
             {
                 if (user.Id1 == a && user.Id2 == b && user.Msg != null)
-                    db2.GetTable<Message>().DeleteOnSubmit(user);
-
-                db2.SubmitChanges();
+                    db.GetTable<Message>().DeleteOnSubmit(user);
             }
+
+            db.SubmitChanges();
         }
 
         public int GetId(string username)
@@ -61,9 +65,9 @@ namespace MSSQLBase
             int iden = 0;
             string name = username;
 
-            WozapDatabaseDataContext db = new WozapDatabaseDataContext();
+            //WozapDatabaseDataContext db = new WozapDatabaseDataContext();
 
-            foreach (var user in db.GetTable<User>().OrderByDescending(u => u.Id))
+            foreach (var user in db.GetTable<User>())
             {
                 if (user.name == name)
                 {
@@ -75,13 +79,13 @@ namespace MSSQLBase
 
         public string[] GetMsg(string userNameFrom, string userNameTo)
         {
-            WozapDatabaseDataContext db = new WozapDatabaseDataContext();
+            //WozapDatabaseDataContext db = new WozapDatabaseDataContext();
 
             int a = GetId(userNameFrom);
             int b = GetId(userNameTo);
 
-            int count = 0;
-            foreach (var user in db.GetTable<Message>().OrderByDescending(u => u.Id2))
+            int count = 1;
+            foreach (var user in db.GetTable<Message>())
             {
                 if (user.Id2 == b && user.Id1 == a)
                 {
@@ -91,7 +95,7 @@ namespace MSSQLBase
             string[] str = new string[count];
             int i = 0;
 
-            foreach (var user in db.GetTable<Message>().OrderByDescending(u => u.Id1))
+            foreach (var user in db.GetTable<Message>())
             {
                 if (user.Id2 == b && user.Id1 == a)
                 {
@@ -116,7 +120,7 @@ namespace MSSQLBase
 
         public string[] GetUsers()
         {
-            WozapDatabaseDataContext db = new WozapDatabaseDataContext();
+            //WozapDatabaseDataContext db = new WozapDatabaseDataContext();
 
             Table<User> users = db.GetTable<User>();
             int max_id = 1;
@@ -145,8 +149,8 @@ namespace MSSQLBase
             int b = GetId(toUser);
             int a = GetId(fromUser);
 
-            WozapDatabaseDataContext db2 = new WozapDatabaseDataContext();
-            foreach (var user in db2.GetTable<Message>().OrderByDescending(u => u.Id2))
+            //WozapDatabaseDataContext db2 = new WozapDatabaseDataContext();
+            foreach (var user in db.GetTable<Message>())
             {
                 if (user.Id2 == b && user.Id1 == a)
                 {

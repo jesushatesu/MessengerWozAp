@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
+using MSSQLBase;
 
 namespace ServiceWCF
 {
@@ -15,7 +16,8 @@ namespace ServiceWCF
 
         public Service()
         {
-            _dataBase = new MSSQLBase.MSSQL();
+            WozapDatabaseDataContext db = new WozapDatabaseDataContext();
+            _dataBase = new MSSQLBase.MSSQL(db);
             
             GetUsersList();
         }

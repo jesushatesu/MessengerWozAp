@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="MSSQLDatabaseTEST" Class="MSSQLDatabaseTESTDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=localhost\SQLEXPRESS;Initial Catalog=MSSQLDatabaseTEST;Persist Security Info=True;User ID=sa" SettingsObjectName="MSSQLDatabaseTEST.Properties.Settings" SettingsPropertyName="MSSQLDatabaseTESTConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Messages" Member="Messages">
+    <Type Name="Message">
+      <Column Name="Id1" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Id2" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Msg" Type="System.String" DbType="NVarChar(200) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Users" Member="Users">
+    <Type Name="User">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="name" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+</Database>
