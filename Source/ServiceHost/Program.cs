@@ -14,7 +14,7 @@ namespace ServiceHost
         static void Main()
         {
             WozapDatabaseDataContext db1 = new WozapDatabaseDataContext();
-            var db = new MSSQLBase.MSSQL(db1);
+            var db = new MSSQL(db1);
             var service = new Service(db);
             using (System.ServiceModel.ServiceHost host = new System.ServiceModel.ServiceHost(service, new Uri("localhost:8080")))
             {

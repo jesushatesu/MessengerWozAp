@@ -9,7 +9,7 @@ namespace ServiceWCF
 {
     public struct User
     {
-        public string name { get; set; }
+        public string Name { get; set; }
 		public bool isConnected;
         public OperationContext opCont { get; set; }
 

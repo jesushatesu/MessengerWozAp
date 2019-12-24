@@ -43,15 +43,16 @@ namespace Sevice.TEST
 
         public string[] GetUsers()
         {
-            string[] str = new string[users.Count()];
-            int i = 0;
+            //string[] str = new string[users.Count()];
+            //int i = 0;
 
-            foreach (var usr in users)
-            {
-                str[i++] = usr;
-            }
+            //foreach (var usr in users)
+            //{
+            //    str[i++] = usr;
+            //}
 
-            return str;
+            //return str;
+            return users.ToArray();
         }
 
         public string ModificationMsgDB(int idMsg, string newMsg)

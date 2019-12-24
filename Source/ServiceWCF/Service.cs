@@ -11,16 +11,8 @@ namespace ServiceWCF
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class Service : IService
     {
-        private MSSQLBase.IDataBase _dataBase { get; set; }
+        private IDataBase _dataBase { get; set; }
         private List<User> _users { get; set; }
-
-        public Service()
-        {
-            WozapDatabaseDataContext db = new WozapDatabaseDataContext();
-            _dataBase = new MSSQLBase.MSSQL(db);
-            
-            GetUsersList();
-        }
 
         public Service(MSSQLBase.IDataBase db)
         {
@@ -41,7 +33,7 @@ namespace ServiceWCF
             
             for (int i = 0; i < _users.Count(); i++)
             {
-                if (_users[i].name == userName)
+                if (_users[i].Name == userName)
 				{
 					_users.Remove(_users[i]);
 					isNewUser = false;
@@ -53,7 +45,7 @@ namespace ServiceWCF
 
             User newUser = new User()
 			{
-				name = userName,
+				Name = userName,
 				isConnected = true,
 				opCont = OperationContext.Current
 			};
@@ -73,13 +65,13 @@ namespace ServiceWCF
             
             for (int i = 0; i < _users.Count(); i++)
 			{
-				if (_users[i].isConnected & _users[i].name != toUserName)
+				if (_users[i].isConnected & _users[i].Name != toUserName)
 					_users[i].opCont.GetCallbackChannel<IServerChatCallback>().ConnectUserCallback(toUserName);
 
                 
-                userStruct[i] = _users[i].name
+                userStruct[i] = _users[i].Name
 					+ ((_users[i].isConnected) ? "1" : "0")
-					+ ((_dataBase.HaveMsg(_users[i].name, toUserName)) ? "1" : "0");
+					+ ((_dataBase.HaveMsg(_users[i].Name, toUserName)) ? "1" : "0");
             }
 
 			return userStruct;
@@ -93,16 +85,16 @@ namespace ServiceWCF
 
 			for (int i = 0; i < _users.Count(); i++)
             {
-				if (_users[i].isConnected & _users[i].name != userName)
+				if (_users[i].isConnected & _users[i].Name != userName)
 					_users[i].opCont.GetCallbackChannel<IServerChatCallback>().DisconnectUserCallback(userName);
 
-				if (_users.ToArray()[i].name == userName)
+				if (_users.ToArray()[i].Name == userName)
 					indexDisconUser = i;
 			}
 
 			if (indexDisconUser != -1)
 			{
-				User newUser = new User(){name = userName, isConnected = false};
+				User newUser = new User(){Name = userName, isConnected = false};
 				_users.Remove(_users[indexDisconUser]);
 				_users.Add(newUser);
 
@@ -123,7 +115,7 @@ namespace ServiceWCF
             bool sendMsg = false;
             foreach(User user in _users)
             {
-                if (user.name == toUserName)
+                if (user.Name == toUserName)
                 {
 					Console.WriteLine("Waiting send msg [" + fromUserName + "] to [" + toUserName + "]");
 					if (user.isConnected)
@@ -151,7 +143,10 @@ namespace ServiceWCF
             Console.WriteLine("GetUnsentMsg for [" + userNameFrom + "] to [" + userNameTo + "]");
             string[] str = _dataBase.GetMsg(userNameFrom, userNameTo);
 
-            Console.WriteLine();
+            foreach (var st in str)
+            {
+            Console.WriteLine(st);
+            }
 
             return str;
         }
@@ -163,7 +158,7 @@ namespace ServiceWCF
             _users = new List<User>();
             foreach (string usr in allUsers)
             {
-                User user = new User { name = usr, isConnected = false };
+                User user = new User { Name = usr, isConnected = false };
 				_users.Add(user);
             }
         }

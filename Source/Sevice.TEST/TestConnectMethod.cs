@@ -15,7 +15,6 @@ namespace Sevice.TEST
         public MockDataBase db;
         public Service testService;
 
-
         private void InitializationsTest()
         {
             db = new MockDataBase();
@@ -25,7 +24,7 @@ namespace Sevice.TEST
         [TestMethod]
         public void TestConstructorMethod()
         {
-            testService = new Service();
+            InitializationsTest();
         }
 
         [TestMethod]
@@ -33,7 +32,7 @@ namespace Sevice.TEST
         {
             InitializationsTest();
 
-            Assert.AreEqual(testService.GetUsr().ToArray()[0].name, "vadik");
+            Assert.AreEqual(testService.GetUsr().ToArray()[0].Name, "vadik");
         }
 
         [TestMethod]
@@ -42,10 +41,10 @@ namespace Sevice.TEST
             InitializationsTest();
 
             testService.Connect("roma");
+            var user = testService.GetUsr().ToArray()[0];
 
-            Assert.AreEqual(testService.GetUsr().ToArray()[0].isConnected, true);
-
-            Assert.AreEqual(testService.GetUsr().ToArray()[0].name, "roma");
+            Assert.AreEqual(user.isConnected, true);
+            Assert.AreEqual(user.Name, "roma");
         }
 
         [TestMethod]
@@ -55,7 +54,7 @@ namespace Sevice.TEST
 
             testService.Connect("snus");
 
-            Assert.AreEqual(testService.GetUsr().ToArray()[0].name, "snus");
+            Assert.AreEqual(testService.GetUsr().ToArray()[0].Name, "snus");
             Assert.AreEqual(testService.GetUsr().ToArray()[0].isConnected, true);
             Assert.AreEqual(db.users.ToArray()[0], "snus");
         }

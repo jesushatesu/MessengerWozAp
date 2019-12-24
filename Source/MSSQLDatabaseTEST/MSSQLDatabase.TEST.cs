@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MSSQLBase;
 
 namespace MSSQLDatabaseTEST
 {
     [TestClass]
     public class MSSQLDatabaseTEST
     {
-        public class EqualString
+        private class EqualString
         {
             private string str;
 
@@ -22,117 +24,70 @@ namespace MSSQLDatabaseTEST
                 return Equals(str, _str);
             }
         }
-
-        private MSSQLDatabaseTESTDataContext db;
-
-        private string RandomString(int size)
-        {
-            StringBuilder builder = new StringBuilder();
-            Random random = new Random();
-            char ch;
-            for (int i = 0; i < size; i++)
-            {
-                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
-                builder.Append(ch);
-            }
-
-            return builder.ToString();
-        }
-
+        
+        private MSSQL db;
+        
         private void InitializationTest()
         {
-            db = new MSSQLDatabaseTESTDataContext();
+            db = new MSSQL(new MSSQLDatabaseTESTDataContext());
         }
 
         [TestMethod]
-        public void GetId()
+        public void GetIdTest()
         {
             InitializationTest();
-            MSSQLBase.MSSQL db1 = new MSSQLBase.MSSQL(db);
-            int a = db1.GetId("vadik");
 
-            Assert.AreEqual(1, a);
+            Assert.AreEqual(1, db.GetId("vadik"));
         }
 
         [TestMethod]
-        public void GetMsg()
+        public void GetMsgTest()
         {
             InitializationTest();
-            MSSQLBase.MSSQL db1 = new MSSQLBase.MSSQL(db);
-            string msg1 = RandomString(7);
-            string msg2 = RandomString(7);
 
-            //db1.AddMsg("egor", "nikita", msg1);
-            //db1.AddMsg("egor", "nikita", msg2);
+            db.AddMsg("egor", "nikita", "hello");
 
-            string[] str = db1.GetMsg("egor", "nikita");
+            Assert.AreNotEqual(-1, db.GetMsg("egor", "nikita").ToList().FindIndex(new EqualString("hello").AreEqual));
+        }
+        
+        [TestMethod]
+        public void AddUserTest()
+        {
+            InitializationTest();
 
-            List<string> lst = new List<string>();
-            foreach (var st in str)
-            {
-                lst.Add(st);
-            }
+            db.AddUser("anyUser");
 
-            EqualString prEqualString = new EqualString(msg1);
-            int index = lst.FindIndex(prEqualString.AreEqual);
-            int index1 = 0;
-            Assert.IsTrue(index1 != -1);
+            Assert.IsTrue(db.GetId("anyUser") != 0);
         }
 
-
         [TestMethod]
-        public void AddUser()
+        public void HaveMessageTest()
         {
             InitializationTest();
-            MSSQLBase.MSSQL db1 = new MSSQLBase.MSSQL(db);
-            string str = RandomString(7);
 
-            db1.AddUser(str);
-            int a = db1.GetId(str);
-
-            Assert.IsTrue(db1.GetId(str) != 0);
+            Assert.IsTrue(db.HaveMsg("vadik", "tema"));
         }
 
-
         [TestMethod]
-        public void HaveMessage()
+        public void AddMessageTest()
         {
             InitializationTest();
-            MSSQLBase.MSSQL db1 = new MSSQLBase.MSSQL(db);
-            bool a = db1.HaveMsg("vadik", "tema");
 
-            Assert.IsTrue(a);
+            db.AddMsg("vadik", "ilya", "hello1");
+
+            Assert.IsTrue(db.HaveMsg("vadik", "ilya"));
+            db.GetMsg("vadik", "ilya");
         }
 
-
         [TestMethod]
-        public void AddMessage()
+        public void DeleteMessageTest()
         {
             InitializationTest();
-            MSSQLBase.MSSQL db1 = new MSSQLBase.MSSQL(db);
-            string str = RandomString(7);
+            db.AddMsg("tema", "ilya", "hello2");
 
-            db1.AddMsg("vadik", "ilya", str);
-            bool a = db1.HaveMsg("vadik", "ilya");
+            db.DeleteMsg("tema", "ilya");
 
-            Assert.IsTrue(a);
-        }
-
-
-        [TestMethod]
-        public void DeleteMessage()
-        {
-            InitializationTest();
-            MSSQLBase.MSSQL db1 = new MSSQLBase.MSSQL(db);
-            string str = RandomString(7);
-
-            db1.AddMsg("tema", "ilya", str);
-            bool a = db1.HaveMsg("tema", "ilya");
-            Assert.IsTrue(a);
-
-            db1.DeleteMsg("tema", "ilya");
-            bool b = db1.HaveMsg("tema", "ilya");
-            Assert.IsFalse(b);
+            Assert.IsFalse(db.HaveMsg("tema", "ilya"));
         }
     }
 }

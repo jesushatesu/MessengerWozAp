@@ -11,152 +11,95 @@ namespace MSSQLBase
 {
     public class MSSQL : IDataBase
     {
-        private dynamic db;
+        private DataContext db;
 
-        public MSSQL(dynamic db1)
+        public MSSQL(DataContext _db)
         {
-            Console.WriteLine("Trying to connect BD with ConnectionString...");
-
-            db = db1;
-
-            Console.WriteLine("BD is connected\n");
+            db = _db;
         }
 
         public void AddMsg(string from, string to, string msg)
         {
-            //WozapDatabaseDataContext db = new WozapDatabaseDataContext();
-            
-            Message user = new Message();
-            user.Id1 = GetId(from);
-            user.Id2 = GetId(to);
-            user.Msg = msg;
-
-            db.GetTable<Message>().InsertOnSubmit(user);
+            db.GetTable<Message>().InsertOnSubmit(new Message() { Id1 = GetId(from), Id2 = GetId(to), Msg = msg });
 
             db.SubmitChanges();
         }
 
-        public void AddUser(string user)
+        public void AddUser(string userName)
         {
-            //WozapDatabaseDataContext db = new WozapDatabaseDataContext();
-            User user1 = new User { name = user };
+            User user = new User { name = userName };
 
-            db.GetTable<User>().InsertOnSubmit(user1);
+            db.GetTable<User>().InsertOnSubmit(user);
             db.SubmitChanges();
         }
 
         public void DeleteMsg(string fromUser, string toUser)
         {
-            int a = GetId(fromUser);
-            int b = GetId(toUser);
-
-            //WozapDatabaseDataContext db2 = new WozapDatabaseDataContext();
+            int idFrom = GetId(fromUser);
+            int idTo = GetId(toUser);
+            
             foreach (var user in db.GetTable<Message>())
             {
-                if (user.Id1 == a && user.Id2 == b && user.Msg != null)
+                if (user.Id1 == idFrom && user.Id2 == idTo && user.Msg != null)
                     db.GetTable<Message>().DeleteOnSubmit(user);
             }
 
             db.SubmitChanges();
         }
 
-        public int GetId(string username)
+        public int GetId(string userName)
         {
-            int iden = 0;
-            string name = username;
-
-            //WozapDatabaseDataContext db = new WozapDatabaseDataContext();
+            int id = 0;
 
             foreach (var user in db.GetTable<User>())
             {
-                if (user.name == name)
-                {
-                    iden = user.Id;
-                }
+                if (user.name == userName)
+                    id = user.Id;
             }
-            return iden;
+
+            return id;
         }
 
         public string[] GetMsg(string userNameFrom, string userNameTo)
         {
-            //WozapDatabaseDataContext db = new WozapDatabaseDataContext();
+            int idFrom = GetId(userNameFrom);
+            int idTo = GetId(userNameTo);
 
-            int a = GetId(userNameFrom);
-            int b = GetId(userNameTo);
-
-            int count = 1;
-            foreach (var user in db.GetTable<Message>())
-            {
-                if (user.Id2 == b && user.Id1 == a)
-                {
-                    count++;
-                }
-            }
-            string[] str = new string[count];
-            int i = 0;
+            List<string> lst = new List<string>();
 
             foreach (var user in db.GetTable<Message>())
             {
-                if (user.Id2 == b && user.Id1 == a)
+                if (user.Id2 == idTo && user.Id1 == idFrom)
                 {
-                    if (i >= count)
-                    {
-                        string[] new_str = new string[count + 10];
-
-                        for (int j = 0; j < count; j++)
-                            new_str[j] = str[j];
-
-                        count += 10;
-                        str = new_str;
-                    }
-                    str[i++] = user.Msg;
+                    lst.Add(user.Msg);
                 }
             }
-
+            
             DeleteMsg(userNameFrom, userNameTo);
 
-            return str;
+            return lst.ToArray();
         }
 
         public string[] GetUsers()
         {
-            //WozapDatabaseDataContext db = new WozapDatabaseDataContext();
-
             Table<User> users = db.GetTable<User>();
-            int max_id = 1;
-            int i = 0;
-            string[] str = new string[max_id];
-            foreach (var user in users)
-            {
-                if (i >= max_id)
-                {
-                    string[] new_str = new string[max_id + 1];
 
-                    for (int j = 0; j < max_id; j++)
-                        new_str[j] = str[j];
-
-                    max_id += 1;
-                    str = new_str;
-                }
-
-                str[i++] = user.name;
-            }
-            return str;
+            return users.Select( u => u.name).ToArray();
         }
 
         public bool HaveMsg(string fromUser, string toUser)
         {
-            int b = GetId(toUser);
-            int a = GetId(fromUser);
-
-            //WozapDatabaseDataContext db2 = new WozapDatabaseDataContext();
+            int idTo = GetId(toUser);
+            int idFrom = GetId(fromUser);
+            
             foreach (var user in db.GetTable<Message>())
             {
-                if (user.Id2 == b && user.Id1 == a)
+                if (user.Id2 == idTo && user.Id1 == idFrom)
                 {
                     return true;
                 }
             }
+
             return false;
         }
     }

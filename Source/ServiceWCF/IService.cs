@@ -23,16 +23,4 @@ namespace ServiceWCF
         [OperationContract]
         string[] GetUnsentMsg(string userNameFrom, string userNameTo);
     }
-
-    public interface IServerChatCallback
-    {
-        [OperationContract(IsOneWay = true)]
-        void MsgCallback(string fromUser, string toUser, string msg);
-
-        [OperationContract(IsOneWay = true)]
-        void ConnectUserCallback(string userName);
-
-        [OperationContract(IsOneWay = true)]
-        void DisconnectUserCallback(string userName);
-    }
 }
