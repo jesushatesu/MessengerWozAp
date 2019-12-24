@@ -27,7 +27,8 @@ namespace MSSQLDatabaseTEST
         
         private MSSQL db;
         
-        private void InitializationTest()
+        [TestInitialize]
+        public void InitializationTest()
         {
             db = new MSSQL(new MSSQLDatabaseTESTDataContext());
         }
@@ -35,16 +36,12 @@ namespace MSSQLDatabaseTEST
         [TestMethod]
         public void GetIdTest()
         {
-            InitializationTest();
-
             Assert.AreEqual(1, db.GetId("vadik"));
         }
 
         [TestMethod]
         public void GetMsgTest()
         {
-            InitializationTest();
-
             db.AddMsg("egor", "nikita", "hello");
 
             Assert.AreNotEqual(-1, db.GetMsg("egor", "nikita").ToList().FindIndex(new EqualString("hello").AreEqual));
@@ -53,8 +50,6 @@ namespace MSSQLDatabaseTEST
         [TestMethod]
         public void AddUserTest()
         {
-            InitializationTest();
-
             db.AddUser("anyUser");
 
             Assert.IsTrue(db.GetId("anyUser") != 0);
@@ -63,16 +58,12 @@ namespace MSSQLDatabaseTEST
         [TestMethod]
         public void HaveMessageTest()
         {
-            InitializationTest();
-
             Assert.IsTrue(db.HaveMsg("vadik", "tema"));
         }
 
         [TestMethod]
         public void AddMessageTest()
         {
-            InitializationTest();
-
             db.AddMsg("vadik", "ilya", "hello1");
 
             Assert.IsTrue(db.HaveMsg("vadik", "ilya"));
@@ -82,7 +73,6 @@ namespace MSSQLDatabaseTEST
         [TestMethod]
         public void DeleteMessageTest()
         {
-            InitializationTest();
             db.AddMsg("tema", "ilya", "hello2");
 
             db.DeleteMsg("tema", "ilya");

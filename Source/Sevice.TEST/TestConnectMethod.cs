@@ -12,10 +12,11 @@ namespace Sevice.TEST
     [TestClass]
     public class TestConnect
     {
-        public MockDataBase db;
-        public Service testService;
+        private MockDataBase db;
+        private Service testService;
 
-        private void InitializationsTest()
+        [TestInitialize]
+        public void InitializationsTest()
         {
             db = new MockDataBase();
             testService = new Service(db);
@@ -24,22 +25,18 @@ namespace Sevice.TEST
         [TestMethod]
         public void TestConstructorMethod()
         {
-            InitializationsTest();
+            //не пустой, тут запускается конструктор из метода InitializationsTest()
         }
 
         [TestMethod]
         public void TestGetUsrMethod()
         {
-            InitializationsTest();
-
             Assert.AreEqual(testService.GetUsr().ToArray()[0].Name, "vadik");
         }
 
         [TestMethod]
         public void TestConnectExistUserMethod()
         {
-            InitializationsTest();
-
             testService.Connect("roma");
             var user = testService.GetUsr().ToArray()[0];
 
@@ -50,8 +47,6 @@ namespace Sevice.TEST
         [TestMethod]
         public void TestConnectNewUserMethod()
         {
-            InitializationsTest();
-
             testService.Connect("snus");
 
             Assert.AreEqual(testService.GetUsr().ToArray()[0].Name, "snus");
@@ -62,8 +57,6 @@ namespace Sevice.TEST
         [TestMethod]
         public void TestDisconnectMethod()
         {
-            InitializationsTest();
-
             testService.Disconnect("vadik");
 
             Assert.AreEqual(testService.GetUsr().ToArray()[0].isConnected, false);
@@ -72,8 +65,6 @@ namespace Sevice.TEST
         [TestMethod]
         public void TestSendMsgMethod()
         {
-            InitializationsTest();
-
             testService.SendMsg("vadik", "tema","hello");
 
             Assert.AreEqual(db.messeges.ToArray()[0], "hello");
@@ -82,17 +73,11 @@ namespace Sevice.TEST
         [TestMethod]
         public void TestGetMsgMethod()
         {
-            InitializationsTest();
-
             testService.SendMsg("vadik", "tema","hello");
-            testService.SendMsg("vadik", "tema","hi");
-            testService.SendMsg("vadik", "tema","wozap");
 
             var str = testService.GetUnsentMsg("vadik", "tema");
 
             Assert.AreEqual(db.messeges.ToArray()[0], str[0]);
-            Assert.AreEqual(db.messeges.ToArray()[1], str[1]);
-            Assert.AreEqual(db.messeges.ToArray()[2], str[2]);
         }
     }
 }

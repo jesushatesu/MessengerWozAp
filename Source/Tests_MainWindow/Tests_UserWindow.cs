@@ -15,7 +15,8 @@ namespace Tests_MainWindow
         private UserWindow _testUW;
         private UserWindow _newUser;
 
-        private void InitializationsTest()
+        [TestInitialize]
+        public void InitializationsTest()
         {
             _sw = new SingInWindow();
             _testUW = new UserWindow(_testNameUser, _sw);
@@ -25,8 +26,6 @@ namespace Tests_MainWindow
         [TestMethod]
         public void DesignerUserWindow()
         {
-            InitializationsTest();
-
             string userName = _testUW.GetUserName();
 
             Assert.AreEqual(_testNameUser, userName);
@@ -35,8 +34,6 @@ namespace Tests_MainWindow
         [TestMethod]
         public void ConnectUserCallback()
         {
-            InitializationsTest();
-
             _testUW.ConnectUserCallback(_newNameUser);
 
             Assert.IsTrue(_testUW.ThisUserIsConnect(_newNameUser));
@@ -46,8 +43,6 @@ namespace Tests_MainWindow
         [TestMethod]
         public void DisconnectUserCallback()
         {
-            InitializationsTest();
-
             _testUW.ConnectUserCallback(_newNameUser);
 
             _testUW.DisconnectUserCallback(_newNameUser);
@@ -58,8 +53,6 @@ namespace Tests_MainWindow
         [TestMethod]
         public void MsgCallbackFromOnlineUser()
         {
-            InitializationsTest();
-
             _testUW.ConnectUserCallback(_newNameUser);
 
             _testUW.SetIdCurrentUserItem(0);
